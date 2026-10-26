@@ -15,13 +15,24 @@ function Read-BridgeState {
     return [pscustomobject]@{ materials=0; hunts=0; toolCrafted=$false; evolutionPoints=0; upgrades=@() }
 }
 
+function Get-SenseReport {
+    $minute = [int][DateTime]::Now.Minute
+    $reports = @(
+        @('Sight: movement on the ridge.','Hearing: birds went quiet nearby.','Scent: fresh water and crushed leaves.'),
+        @('Sight: a safe route crosses the valley.','Hearing: distant animal calls east.','Scent: predator trace, less than a day old.'),
+        @('Sight: edible plants near the rocks.','Hearing: running water downhill.','Scent: another group may be nearby.'),
+        @('Sight: your territory is open ahead.','Hearing: wind and insects only.','Scent: stone, vegetation and camp smoke.')
+    )
+    return $reports[$minute % $reports.Count]
+}
+
 $form = New-Object System.Windows.Forms.Form
 $form.FormBorderStyle = 'None'
 $form.ShowInTaskbar = $false
 $form.TopMost = $true
 $form.StartPosition = 'Manual'
-$form.Size = New-Object System.Drawing.Size(360,205)
-$form.Location = New-Object System.Drawing.Point(([System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Width - 380),30)
+$form.Size = New-Object System.Drawing.Size(390,225)
+$form.Location = New-Object System.Drawing.Point(([System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea.Width - 410),30)
 $form.BackColor = [System.Drawing.Color]::FromArgb(18,22,18)
 $form.Opacity = 0.92
 
@@ -37,37 +48,25 @@ $status = New-Object System.Windows.Forms.Label
 $status.ForeColor = [System.Drawing.Color]::White
 $status.Font = New-Object System.Drawing.Font('Segoe UI',9)
 $status.Location = New-Object System.Drawing.Point(14,38)
-$status.Size = New-Object System.Drawing.Size(330,95)
+$status.Size = New-Object System.Drawing.Size(360,135)
 $form.Controls.Add($status)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text = 'F8 hide/show  •  F9 open full tribe interface  •  Esc hide'
+$hint.Text = 'F8 hide/show  •  F9 open tribe interface  •  Esc hide'
 $hint.ForeColor = [System.Drawing.Color]::FromArgb(160,170,158)
 $hint.Font = New-Object System.Drawing.Font('Segoe UI',8)
-$hint.Location = New-Object System.Drawing.Point(14,174)
+$hint.Location = New-Object System.Drawing.Point(14,198)
 $hint.AutoSize = $true
 $form.Controls.Add($hint)
-
-function Get-SenseReport {
-    $minute = [int][DateTime]::Now.Minute
-    $reports = @(
-        @('Sight: movement on the ridge.','Hearing: birds went quiet nearby.','Scent: fresh water and crushed leaves.'),
-        @('Sight: a safe route crosses the valley.','Hearing: distant animal calls east.','Scent: predator trace, less than a day old.'),
-        @('Sight: edible plants near the rocks.','Hearing: running water downhill.','Scent: another group may be nearby.'),
-        @('Sight: your territory is open ahead.','Hearing: wind and insects only.','Scent: stone, vegetation and camp smoke.')
-    )
-    return $reports[$minute % $reports.Count]
-}
 
 function Refresh-Overlay {
     $s = Read-BridgeState
     $upgrades = @($s.upgrades) -join ', '
     if (-not $upgrades) { $upgrades = 'None' }
     $r = Get-SenseReport
-    $status.Text = "SENSES`n  👁 $($r[0].Substring(8))`n  👂 $($r[1].Substring(10))`n  👃 $($r[2].Substring(8))`n`nTRIBE BRIDGE`n  Materials: $($s.materials)   Hunts: $($s.hunts)   Evolution XP: $($s.evolutionPoints)`n  Upgrades: $upgrades"
+    $status.Text = "SENSES`n  👁 $($r[0] -replace '^[^:]+:\s*','')`n  👂 $($r[1] -replace '^[^:]+:\s*','')`n  👃 $($r[2] -replace '^[^:]+:\s*','')`n`nTRIBE BRIDGE`n  Materials: $($s.materials)   Hunts: $($s.hunts)   Evolution XP: $($s.evolutionPoints)`n  Upgrades: $upgrades"
 }
 
-# Register global hotkeys through a small native helper. The overlay is non-activating/click-through.
 Add-Type @"
 using System;
 using System.Runtime.InteropServices;
@@ -81,6 +80,25 @@ public static class PDNative {
 }
 "@
 
+class PSMessageFilter : System.Windows.Forms.IMessageFilter {
+    [System.Windows.Forms.Form] $Form
+    [string] $Prototype
+    PSMessageFilter([System.Windows.Forms.Form] $f, [string] $p) { $this.Form=$f; $this.Prototype=$p }
+    [bool] PreFilterMessage([ref] [System.Windows.Forms.Message] $m) {
+        if ($m.Msg -eq 0x0312) {
+            if ($m.WParam.ToInt32() -eq 100) {
+                if ($this.Form.Visible) { $this.Form.Hide() } else { $this.Form.Show() }
+                return $true
+            }
+            if ($m.WParam.ToInt32() -eq 101) {
+                if (Test-Path $this.Prototype) { Start-Process -FilePath $this.Prototype }
+                return $true
+            }
+        }
+        return $false
+    }
+}
+
 $form.Add_Shown({
     $h = $form.Handle
     $style = [PDNative]::GetWindowLong($h,[PDNative]::GWL_EXSTYLE)
@@ -90,28 +108,16 @@ $form.Add_Shown({
     Refresh-Overlay
 })
 
-$form.Add_KeyDown({ if ($_.KeyCode -eq 'Escape') { $form.Hide() } })
+$form.Add_FormClosed({
+    [PDNative]::UnregisterHotKey($form.Handle,100) | Out-Null
+    [PDNative]::UnregisterHotKey($form.Handle,101) | Out-Null
+})
+
 $timer = New-Object System.Windows.Forms.Timer
 $timer.Interval = 2500
 $timer.Add_Tick({ if ($form.Visible) { Refresh-Overlay } })
 $timer.Start()
 
-# Process Windows messages for the hotkeys.
-$nativeWindow = New-Object System.Windows.Forms.NativeWindow
-$nativeWindow.AssignHandle($form.Handle)
-[System.Windows.Forms.Application]::AddMessageFilter((New-Object PSMessageFilter($form)))
-
-class PSMessageFilter : System.Windows.Forms.IMessageFilter {
-    [System.Windows.Forms.Form] $Form
-    PSMessageFilter([System.Windows.Forms.Form] $f) { $this.Form=$f }
-    [bool] PreFilterMessage([ref] [System.Windows.Forms.Message] $m) {
-        if ($m.Msg -eq 0x0312) {
-            if ($m.WParam.ToInt32() -eq 100) { if ($this.Form.Visible) { $this.Form.Hide() } else { $this.Form.Show() } ; return $true }
-            if ($m.WParam.ToInt32() -eq 101) { if (Test-Path $PrototypePath) { Start-Process -FilePath $PrototypePath }; return $true }
-        }
-        return $false
-    }
-}
-
+[System.Windows.Forms.Application]::AddMessageFilter([PSMessageFilter]::new($form,$PrototypePath))
 Refresh-Overlay
 [void]$form.ShowDialog()
