@@ -1,6 +1,8 @@
 # Primal Defiance - local bridge prototype
 # Windows PowerShell 5.1+
-# Detects owned Steam installs by Steam AppID, stores progression locally, and launches the unified Primal Defiance alpha.
+# Detects owned Steam installs by Steam AppID, stores progression locally, launches the alpha,
+# and can run an external companion overlay beside Dawn of Defiance.
+# The overlay does not inject into, modify, or read game memory.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -8,6 +10,7 @@ Add-Type -AssemblyName System.Drawing
 $AppDir = Join-Path $env:LOCALAPPDATA 'PrimalDefiance'
 $StateFile = Join-Path $AppDir 'state.json'
 $PrototypePath = Join-Path $PSScriptRoot 'prototype-v4.html'
+$OverlayPath = Join-Path $PSScriptRoot 'primal-overlay.ps1'
 New-Item -ItemType Directory -Force -Path $AppDir | Out-Null
 
 function Read-State {
@@ -82,11 +85,19 @@ function Find-Installations {
     return [pscustomobject]@{Dawn=$dawn; Ancestors=$anc}
 }
 
+function Start-Overlay {
+    if (Test-Path $OverlayPath) {
+        Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File',$OverlayPath) -WindowStyle Hidden
+        return $true
+    }
+    return $false
+}
+
 $script:state = Read-State
 $script:installs = Find-Installations
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Primal Defiance — Release Candidate'
-$form.Size = New-Object System.Drawing.Size(720,575)
+$form.Size = New-Object System.Drawing.Size(720,635)
 $form.StartPosition = 'CenterScreen'
 
 $title = New-Object System.Windows.Forms.Label
@@ -102,12 +113,14 @@ function Refresh-Status {
     $dawnText=if($script:installs.Dawn){"FOUND`n$($script:installs.Dawn.Exe)"}else{'NOT FOUND'}
     $ancText=if($script:installs.Ancestors){"FOUND`n$($script:installs.Ancestors.Root)"}else{'NOT FOUND'}
     $prototypeText=if(Test-Path $PrototypePath){'FOUND — Tribe Alpha'}else{'NOT FOUND'}
+    $overlayText=if(Test-Path $OverlayPath){'FOUND — external companion overlay'}else{'NOT FOUND'}
     $status.Text=@"
 Host — Dawn of Defiance: $dawnText
 
 Companion — Ancestors: The Humankind Odyssey: $ancText
 
 Primal Defiance layer: $prototypeText
+Companion overlay: $overlayText
 
 Bridge progression
 Materials: $($script:state.materials)    Hunts: $($script:state.hunts)    Tool crafted: $($script:state.toolCrafted)
@@ -115,6 +128,7 @@ Evolution points: $($script:state.evolutionPoints)
 Upgrades: $((@($script:state.upgrades) -join ', '))
 
 Steam AppIDs and appmanifest files are used for detection.
+The overlay is external and does not inject into or modify the host game.
 No game assets are included or redistributed.
 "@
 }
@@ -130,10 +144,17 @@ Add-Button 'Launch Dawn of Defiance' 456 345 {if($script:installs.Dawn -and (Tes
 Add-Button 'Open Primal Defiance' 24 405 {if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}else{[System.Windows.Forms.MessageBox]::Show('prototype-v4.html was not found beside this launcher.')}}
 Add-Button 'Start Primal Defiance' 240 405 {
     if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}
+    $overlayStarted=Start-Overlay
     if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}
     else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}
 }
-$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset bridge progression'; $reset.Location=New-Object System.Drawing.Point(456,405); $reset.Size=New-Object System.Drawing.Size(200,42)
+Add-Button 'Start with Companion Overlay' 456 405 {
+    $overlayStarted=Start-Overlay
+    if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}
+    else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}
+}
+Add-Button 'Open Companion Overlay' 24 465 {if(Test-Path $OverlayPath){Start-Overlay}else{[System.Windows.Forms.MessageBox]::Show('primal-overlay.ps1 was not found beside this launcher.')}}
+$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset bridge progression'; $reset.Location=New-Object System.Drawing.Point(240,465); $reset.Size=New-Object System.Drawing.Size(200,42)
 $reset.Add_Click({$script:state=[pscustomobject]@{materials=0;hunts=0;toolCrafted=$false;evolutionPoints=0;upgrades=@()};Save-State $script:state;Refresh-Status}); $form.Controls.Add($reset)
 
 Refresh-Status
