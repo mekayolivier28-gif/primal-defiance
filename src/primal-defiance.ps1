@@ -1,12 +1,13 @@
 # Primal Defiance - local bridge prototype
 # Windows PowerShell 5.1+
-# Detects owned Steam installs by Steam AppID, stores progression locally, and can launch the host.
+# Detects owned Steam installs by Steam AppID, stores progression locally, and can launch the host and survival prototype.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 $AppDir = Join-Path $env:LOCALAPPDATA 'PrimalDefiance'
 $StateFile = Join-Path $AppDir 'state.json'
+$PrototypePath = Join-Path $PSScriptRoot 'prototype.html'
 New-Item -ItemType Directory -Force -Path $AppDir | Out-Null
 
 function Read-State {
@@ -85,7 +86,7 @@ $script:state = Read-State
 $script:installs = Find-Installations
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Primal Defiance — Prototype'
-$form.Size = New-Object System.Drawing.Size(720,520)
+$form.Size = New-Object System.Drawing.Size(720,575)
 $form.StartPosition = 'CenterScreen'
 
 $title = New-Object System.Windows.Forms.Label
@@ -100,17 +101,20 @@ function Refresh-Status {
     $script:installs=Find-Installations
     $dawnText=if($script:installs.Dawn){"FOUND`n$($script:installs.Dawn.Exe)"}else{'NOT FOUND'}
     $ancText=if($script:installs.Ancestors){"FOUND`n$($script:installs.Ancestors.Root)"}else{'NOT FOUND'}
+    $prototypeText=if(Test-Path $PrototypePath){'FOUND'}else{'NOT FOUND'}
     $status.Text=@"
 Host — Dawn of Defiance: $dawnText
 
 Companion — Ancestors: The Humankind Odyssey: $ancText
+
+Survival prototype: $prototypeText
 
 Local progression
 Materials: $($script:state.materials)    Hunts: $($script:state.hunts)    Tool crafted: $($script:state.toolCrafted)
 Evolution points: $($script:state.evolutionPoints)
 Upgrades: $((@($script:state.upgrades) -join ', '))
 
-Detection now uses Steam AppIDs and appmanifest files, so custom Steam library locations are supported.
+Detection uses Steam AppIDs and appmanifest files, so custom Steam library locations are supported.
 No game assets are included.
 "@
 }
@@ -123,7 +127,14 @@ Add-Button 'Craft primitive tool' 456 285 {if($script:state.materials -ge 3){$sc
 Add-Button 'Complete hunt / combat' 24 345 {if($script:state.toolCrafted){$script:state.hunts+=1;$script:state.evolutionPoints+=1;Save-State $script:state;Refresh-Status}else{[System.Windows.Forms.MessageBox]::Show('Craft the primitive tool first.')}}
 Add-Button 'Unlock evolution upgrade' 240 345 {if($script:state.evolutionPoints -gt 0){$script:state.evolutionPoints-=1;$script:state.upgrades=@($script:state.upgrades)+'Primal Adaptation';Save-State $script:state;Refresh-Status}else{[System.Windows.Forms.MessageBox]::Show('Complete a hunt / combat encounter first.')}}
 Add-Button 'Launch Dawn of Defiance' 456 345 {if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}}
-$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset prototype progression'; $reset.Location=New-Object System.Drawing.Point(24,415); $reset.Size=New-Object System.Drawing.Size(200,36)
+Add-Button 'Open survival prototype' 24 405 {if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}else{[System.Windows.Forms.MessageBox]::Show('prototype.html was not found beside this launcher.')}}
+Add-Button 'Start Primal Defiance' 240 405 {
+    if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}
+    if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}
+    else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}
+}
+$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset prototype progression'; $reset.Location=New-Object System.Drawing.Point(456,405); $reset.Size=New-Object System.Drawing.Size(200,42)
 $reset.Add_Click({$script:state=[pscustomobject]@{materials=0;hunts=0;toolCrafted=$false;evolutionPoints=0;upgrades=@()};Save-State $script:state;Refresh-Status}); $form.Controls.Add($reset)
+
 Refresh-Status
 [void]$form.ShowDialog()
