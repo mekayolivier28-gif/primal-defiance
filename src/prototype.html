@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Primal Defiance — Prototype</title>
+<style>
+body{margin:0;background:#10120f;color:#eee;font:16px system-ui,sans-serif}main{max-width:900px;margin:40px auto;padding:24px}h1{margin:0 0 6px;font-size:38px}.muted{color:#a8b0a2}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.card{background:#1a1e19;border:1px solid #343b32;border-radius:12px;padding:16px}.big{font-size:28px;font-weight:700}button{padding:12px 16px;border:0;border-radius:9px;background:#d8c58b;color:#111;font-weight:700;cursor:pointer;margin:5px}button:disabled{opacity:.35;cursor:not-allowed}.log{height:170px;overflow:auto;background:#0b0d0b;border-radius:10px;padding:12px;white-space:pre-wrap}.upgrade{display:flex;align-items:center;justify-content:space-between}.bar{height:8px;background:#30362e;border-radius:8px;overflow:hidden}.fill{height:100%;background:#d8c58b;width:0%}
+</style>
+</head>
+<body>
+<main>
+<h1>PRIMAL DEFIANCE</h1>
+<div class="muted">Prototype progression layer — Dawn of Defiance host concept + Ancestors-inspired evolution.</div>
+<div class="grid">
+<div class="card"><div class="muted">Materials</div><div id="materials" class="big">0</div></div>
+<div class="card"><div class="muted">Hunts</div><div id="hunts" class="big">0</div></div>
+<div class="card"><div class="muted">Evolution points</div><div id="xp" class="big">0</div></div>
+</div>
+<div class="card">
+<h2>First-minute loop</h2>
+<button id="gather">Gather resources (+3)</button>
+<button id="craft">Craft primitive tool (3)</button>
+<button id="hunt">Hunt / combat</button>
+</div>
+<div class="card">
+<h2>Evolution</h2>
+<div class="upgrade"><span><b>Primal Adaptation</b><br><span class="muted">First evolution-linked survival upgrade</span></span><button id="upgrade">Unlock (1 point)</button></div>
+<div class="bar"><div id="fill" class="fill"></div></div>
+<p id="upgrades" class="muted">No upgrades unlocked.</p>
+</div>
+<div class="card"><h2>Event log</h2><div id="log" class="log"></div></div>
+</main>
+<script>
+const s={materials:0,hunts:0,tool:false,xp:0,upgrade:false};
+const $=id=>document.getElementById(id);
+function log(t){$('log').textContent+='> '+t+'\n';$('log').scrollTop=$('log').scrollHeight}
+function render(){
+ $('materials').textContent=s.materials;$('hunts').textContent=s.hunts;$('xp').textContent=s.xp;
+ $('craft').disabled=s.materials<3||s.tool;$('hunt').disabled=!s.tool;$('upgrade').disabled=s.xp<1||s.upgrade;
+ $('fill').style.width=s.upgrade?'100%':'0%';$('upgrades').textContent=s.upgrade?'Unlocked: Primal Adaptation':'No upgrades unlocked.';
+}
+$('gather').onclick=()=>{s.materials+=3;log('Gathered starter materials.');render()};
+$('craft').onclick=()=>{s.materials-=3;s.tool=true;log('Crafted a primitive survival tool.');render()};
+$('hunt').onclick=()=>{s.hunts++;s.xp++;log('Completed a hunt/combat encounter. +1 evolution point.');render()};
+$('upgrade').onclick=()=>{s.xp--;s.upgrade=true;log('Evolution unlocked: Primal Adaptation.');render()};
+log('Primal Defiance prototype ready.');render();
+</script>
+</body>
+</html>
