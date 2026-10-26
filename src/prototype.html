@@ -3,60 +3,87 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Primal Defiance — Survival Prototype</title>
+<title>Primal Defiance — Survival & Tribe Prototype</title>
 <style>
-:root{--bg:#0d100d;--panel:#171b16;--line:#30372e;--text:#f0f1ec;--muted:#aab2a4;--accent:#d7c27e;--danger:#c96d5b}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#20261d 0,#0d100d 45%);color:var(--text);font:15px system-ui,sans-serif}main{max-width:1050px;margin:28px auto;padding:22px}h1{margin:0;font-size:42px;letter-spacing:1px}.muted{color:var(--muted)}.tag{display:inline-block;margin:8px 0;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.card{background:rgba(23,27,22,.94);border:1px solid var(--line);border-radius:12px;padding:15px}.stat{font-size:27px;font-weight:800}.bar{height:8px;background:#2b3029;border-radius:9px;overflow:hidden;margin-top:7px}.fill{height:100%;width:0;background:var(--accent);transition:.2s}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{padding:12px;border:1px solid #5b604f;border-radius:9px;background:#d7c27e;color:#111;font-weight:800;cursor:pointer}button:disabled{opacity:.3;cursor:not-allowed}.choice{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding:12px 0}.log{height:190px;overflow:auto;background:#080a08;border-radius:9px;padding:12px;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:13px}.danger{color:var(--danger)}@media(max-width:760px){.grid,.actions{grid-template-columns:1fr 1fr}}
+:root{--bg:#0b0e0b;--panel:#151a14;--line:#30382d;--text:#eef0e9;--muted:#aab3a4;--accent:#d7c27e;--danger:#c96d5b;--good:#8fb878}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#20271e 0,#0b0e0b 50%);color:var(--text);font:15px system-ui,sans-serif}main{max-width:1120px;margin:24px auto;padding:20px}h1{margin:0;font-size:42px;letter-spacing:1px}h2{margin:0 0 12px}.muted{color:var(--muted)}.tag{display:inline-block;margin:8px 0;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0}.card{background:rgba(21,26,20,.96);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:10px}.stat{font-size:26px;font-weight:800}.bar{height:8px;background:#292f28;border-radius:9px;overflow:hidden;margin-top:7px}.fill{height:100%;width:0;background:var(--accent);transition:.2s}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button,select{padding:11px;border:1px solid #5b604f;border-radius:9px;background:#d7c27e;color:#111;font-weight:800;cursor:pointer}button:disabled{opacity:.3;cursor:not-allowed}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sense{border:1px solid var(--line);border-radius:10px;padding:12px;background:#0f130f}.sense b{display:block;margin-bottom:5px}.choice{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding:12px 0}.member{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-top:1px solid var(--line);padding:10px 0}.member small{display:block;color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin:2px;color:var(--muted)}.log{height:180px;overflow:auto;background:#070907;border-radius:9px;padding:12px;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:13px}.danger{color:var(--danger)}.good{color:var(--good)}@media(max-width:800px){.grid,.actions,.two,.three{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid,.actions,.two,.three{grid-template-columns:1fr}h1{font-size:32px}}
 </style>
 </head>
 <body>
 <main>
 <h1>PRIMAL DEFIANCE</h1>
-<div class="muted">Survival + evolution prototype — Dawn of Defiance host concept with an Ancestors-inspired progression layer.</div>
+<div class="muted">Survival + senses + tribe prototype — an original progression layer designed to sit beside your host game.</div>
 <div class="tag" id="stage">Stage 1 — Survive</div>
 <div class="grid">
 <div class="card"><div class="muted">Day</div><div id="day" class="stat">1</div></div>
-<div class="card"><div class="muted">Food</div><div id="food" class="stat">6</div><div class="bar"><div id="foodBar" class="fill"></div></div></div>
+<div class="card"><div class="muted">Food</div><div id="food" class="stat">8</div><div class="bar"><div id="foodBar" class="fill"></div></div></div>
 <div class="card"><div class="muted">Stamina</div><div id="stamina" class="stat">100</div><div class="bar"><div id="staminaBar" class="fill"></div></div></div>
 <div class="card"><div class="muted">Evolution</div><div id="xp" class="stat">0</div><div class="bar"><div id="xpBar" class="fill"></div></div></div>
+<div class="card"><div class="muted">Tribe</div><div id="tribeCount" class="stat">1</div><div class="muted" id="moraleText">Morale 70</div></div>
 </div>
+
+<div class="card"><h2>Primal senses</h2><div class="muted">Use your senses to read the territory before committing to an action. Senses are a gameplay system, not copied game assets.</div><div class="three" style="margin-top:10px">
+<div class="sense"><b>👁 Sight</b><span id="sight">Nothing unusual.</span></div>
+<div class="sense"><b>👂 Hearing</b><span id="hearing">The territory is quiet.</span></div>
+<div class="sense"><b>👃 Scent</b><span id="scent">You smell water, stone and vegetation.</span></div>
+</div><button id="senseBtn" style="margin-top:10px">Focus senses</button></div>
+
 <div class="card"><h2>Survival actions</h2><div class="actions">
 <button id="gather">Gather (+3 materials)</button><button id="hunt">Hunt (+food / XP)</button><button id="rest">Rest (+stamina)</button>
 <button id="craft">Craft primitive tool (3)</button><button id="explore">Explore territory</button><button id="endday">End day</button>
-</div><p class="muted" id="resources">Materials: 0 · Tool: no · Hunts: 0</p></div>
+</div><p class="muted" id="resources">Materials: 0 · Tool: no · Hunts: 0 · Water: 0</p></div>
+
+<div class="card"><h2>Tribe</h2><p class="muted">Grow a small band, keep morale high, and assign people jobs. Tribe members consume food each night and can contribute to gathering, hunting, scouting and camp care.</p><div class="three">
+<button id="searchRecruit">Search for survivor</button><button id="bond">Bond with tribe</button><button id="tribeHunt">Organize group hunt</button>
+</div><div id="tribeList"></div></div>
+
 <div class="card"><h2>Evolution choices</h2>
 <div class="choice"><span><b>Primal Adaptation</b><br><span class="muted">+15 maximum stamina.</span></span><button id="adapt">Unlock — 1 XP</button></div>
 <div class="choice"><span><b>Efficient Forager</b><br><span class="muted">Gather 5 materials instead of 3.</span></span><button id="forager">Unlock — 2 XP</button></div>
 <div class="choice"><span><b>Predator Instinct</b><br><span class="muted">Hunts grant +2 evolution XP.</span></span><button id="predator">Unlock — 3 XP</button></div>
+<div class="choice"><span><b>Keen Senses</b><br><span class="muted">Focus senses reveals more useful clues and costs less stamina.</span></span><button id="keen">Unlock — 2 XP</button></div>
+<div class="choice"><span><b>Tribal Memory</b><br><span class="muted">Your tribe starts each day with +10 morale.</span></span><button id="memory">Unlock — 3 XP</button></div>
 </div>
+
 <div class="card"><h2>Event log</h2><div id="log" class="log"></div></div>
-<p class="muted">Prototype only. It uses no Dawn of Defiance or Ancestors assets and stores this prototype's save in your browser.</p>
+<p class="muted">Prototype only. No Dawn of Defiance or Ancestors assets are included. Save data is stored locally in this browser.</p>
 </main>
 <script>
-const key='primal-defiance-survival-v2';
-const fresh={day:1,food:6,stamina:100,maxStamina:100,materials:0,hunts:0,tool:false,xp:0,upgrades:[],dead:false};
+const key='primal-defiance-survival-v3';
+const fresh={day:1,food:8,stamina:100,maxStamina:100,materials:0,water:0,hunts:0,tool:false,xp:0,upgrades:[],morale:70,tribe:[{name:'You',role:'Leader',health:100,loyalty:100}],dead:false,lastSense:0};
 let s=JSON.parse(localStorage.getItem(key)||'null')||fresh;
 const $=id=>document.getElementById(id);
+const roles=['Forager','Hunter','Scout','Caretaker'];
+const names=['Ari','Koa','Mira','Tala','Niko','Rhea','Suri','Ivo','Nala','Kiri','Taro','Ena'];
 function save(){localStorage.setItem(key,JSON.stringify(s))}
 function log(t){$('log').textContent+='> '+t+'\n';$('log').scrollTop=$('log').scrollHeight}
 function spend(n){if(s.stamina<n){log('Too exhausted. Rest first.');return false}s.stamina-=n;return true}
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function render(){
- $('day').textContent=s.day;$('food').textContent=s.food;$('stamina').textContent=s.stamina;$('xp').textContent=s.xp;
- $('foodBar').style.width=Math.min(100,s.food/12*100)+'%';$('staminaBar').style.width=Math.max(0,s.stamina/s.maxStamina*100)+'%';$('xpBar').style.width=Math.min(100,s.xp/6*100)+'%';
- $('resources').textContent=`Materials: ${s.materials} · Tool: ${s.tool?'yes':'no'} · Hunts: ${s.hunts}`;
- $('craft').disabled=s.tool||s.materials<3;$('hunt').disabled=!s.tool||s.food<=0;$('adapt').disabled=s.xp<1||s.upgrades.includes('Primal Adaptation');$('forager').disabled=s.xp<2||s.upgrades.includes('Efficient Forager');$('predator').disabled=s.xp<3||s.upgrades.includes('Predator Instinct');
- $('stage').textContent=s.day<4?'Stage 1 — Survive':s.day<8?'Stage 2 — Adapt':'Stage 3 — Dominate';
+ $('day').textContent=s.day;$('food').textContent=s.food;$('stamina').textContent=s.stamina;$('xp').textContent=s.xp;$('tribeCount').textContent=s.tribe.length;$('moraleText').textContent='Morale '+s.morale;
+ $('foodBar').style.width=Math.min(100,s.food/18*100)+'%';$('staminaBar').style.width=Math.max(0,s.stamina/s.maxStamina*100)+'%';$('xpBar').style.width=Math.min(100,s.xp/8*100)+'%';
+ $('resources').textContent=`Materials: ${s.materials} · Tool: ${s.tool?'yes':'no'} · Hunts: ${s.hunts} · Water: ${s.water}`;
+ $('craft').disabled=s.tool||s.materials<3;$('hunt').disabled=!s.tool||s.food<=0;$('tribeHunt').disabled=s.tribe.length<2||s.food<=0;$('adapt').disabled=s.xp<1||s.upgrades.includes('Primal Adaptation');$('forager').disabled=s.xp<2||s.upgrades.includes('Efficient Forager');$('predator').disabled=s.xp<3||s.upgrades.includes('Predator Instinct');$('keen').disabled=s.xp<2||s.upgrades.includes('Keen Senses');$('memory').disabled=s.xp<3||s.upgrades.includes('Tribal Memory');
+ $('stage').textContent=s.day<4?'Stage 1 — Survive':s.day<8?'Stage 2 — Adapt':s.day<15?'Stage 3 — Tribe':'Stage 4 — Dominate';
+ $('tribeList').innerHTML=s.tribe.map((m,i)=>`<div class="member"><div><b>${m.name}</b> <span class="pill">${m.role}</span><small>Health ${m.health} · Loyalty ${m.loyalty}</small></div><button ${i===0?'disabled':''} onclick="cycleRole(${i})">Change role</button></div>`).join('');
 }
-$('gather').onclick=()=>{if(!spend(8))return;const n=s.upgrades.includes('Efficient Forager')?5:3;s.materials+=n;log(`Gathered ${n} materials.`);save();render()};
+function cycleRole(i){const m=s.tribe[i];m.role=roles[(roles.indexOf(m.role)+1)%roles.length];log(`${m.name} is now a ${m.role}.`);save();render()}
+$('gather').onclick=()=>{if(!spend(s.upgrades.includes('Keen Senses')?6:8))return;let n=s.upgrades.includes('Efficient Forager')?5:3;n+=s.tribe.filter(m=>m.role==='Forager').length*2;s.materials+=n;log(`Gathered ${n} materials with the tribe's help.`);save();render()};
 $('craft').onclick=()=>{if(s.materials<3){log('Need 3 materials.');return}s.materials-=3;s.tool=true;log('Crafted a primitive survival tool.');save();render()};
-$('hunt').onclick=()=>{if(!spend(20))return;const food=3+Math.floor(Math.random()*4);s.food=Math.min(12,s.food+food);s.hunts++;s.xp+=s.upgrades.includes('Predator Instinct')?3:1;log(`Successful hunt. +${food} food and evolution XP.`);save();render()};
-$('rest').onclick=()=>{s.stamina=Math.min(s.maxStamina,s.stamina+35);log('Rested and recovered stamina.');save();render()};
-$('explore').onclick=()=>{if(!spend(25))return;const events=['You found a sheltered water source.','You spotted a dangerous predator and escaped.','You found useful stone and fiber.','You discovered a new hunting ground.'];const e=events[Math.floor(Math.random()*events.length)];if(Math.random()<.5)s.materials+=2;log(e);save();render()};
-$('endday').onclick=()=>{if(s.food<=0){log('You cannot end the day without food.');return}s.food--;s.day++;s.stamina=Math.max(0,s.stamina-10);log(`Night falls. Day ${s.day} begins.`);if(s.day%3===0)s.xp++;save();render()};
+$('hunt').onclick=()=>{if(!spend(20))return;const food=3+Math.floor(Math.random()*4);s.food=Math.min(18,s.food+food);s.hunts++;s.xp+=s.upgrades.includes('Predator Instinct')?3:1;s.morale=Math.min(100,s.morale+2);log(`Successful solo hunt. +${food} food and evolution XP.`);save();render()};
+$('tribeHunt').onclick=()=>{if(!spend(15))return;const hunters=s.tribe.filter(m=>m.role==='Hunter').length;const food=5+hunters*3+Math.floor(Math.random()*5);s.food=Math.min(18,s.food+food);s.hunts++;s.xp+=1+hunters; s.morale=Math.min(100,s.morale+5);log(`Group hunt succeeded. ${s.tribe.length} members return with ${food} food.`);save();render()};
+$('rest').onclick=()=>{s.stamina=Math.min(s.maxStamina,s.stamina+35);s.morale=Math.min(100,s.morale+3);log('Rested at camp and recovered stamina.');save();render()};
+$('explore').onclick=()=>{if(!spend(25))return;const events=[['You found a sheltered water source.',2],['You spotted fresh tracks and avoided a dangerous predator.',1],['You found useful stone and fiber.',3],['You discovered a new hunting ground.',1],['You heard distant movement; the tribe stays alert.',0]];const [e,mat]=rand(events);s.materials+=mat;s.water+=e.includes('water')?2:0;log(e);if(mat)log(`+${mat} materials.`);save();render()};
+$('senseBtn').onclick=()=>{const cost=s.upgrades.includes('Keen Senses')?5:12;if(!spend(cost))return;const sightings=['Fresh animal tracks lead toward the valley.','A safe climbing route is visible beyond the trees.','Something large passed nearby recently.','A patch of edible plants is close.'];const sounds=['Birds suddenly go quiet to the east.','Running water can be heard downhill.','A distant animal call echoes from the ridge.','Your tribe hears movement in the brush.'];const scents=['Water and crushed leaves drift from the north.','A predator scent is nearby; caution is advised.','Smoke-like scent suggests another group may be close.','Edible plants are strongly scented nearby.'];$('sight').textContent=rand(sightings);$('hearing').textContent=rand(sounds);$('scent').textContent=rand(scents);log('You focus your senses and read the territory.');save();render()};
+$('searchRecruit').onclick=()=>{if(s.tribe.length>=8){log('Your tribe is already large enough for this prototype.');return}if(!spend(10))return;const candidate={name:rand(names),role:rand(roles),health:80+Math.floor(Math.random()*21),loyalty:45+Math.floor(Math.random()*36)};s.tribe.push(candidate);s.morale=Math.max(0,s.morale-4);log(`${candidate.name} joins the tribe as a ${candidate.role}. Loyalty ${candidate.loyalty}.`);save();render()};
+$('bond').onclick=()=>{if(s.tribe.length<2){log('You need at least one other tribe member.');return}if(!spend(5))return;const m=rand(s.tribe.slice(1));m.loyalty=Math.min(100,m.loyalty+10);s.morale=Math.min(100,s.morale+10);log(`You bond with ${m.name}. Tribe morale rises.`);save();render()};
+$('endday').onclick=()=>{const cost=s.tribe.length;if(s.food<cost){log(`The tribe needs ${cost} food to make it through the night.`);return}s.food-=cost;s.day++;s.stamina=Math.max(0,s.stamina-10);const foragers=s.tribe.filter(m=>m.role==='Forager').length;const hunters=s.tribe.filter(m=>m.role==='Hunter').length;const scouts=s.tribe.filter(m=>m.role==='Scout').length;s.food=Math.min(18,s.food+foragers);s.materials+=scouts;s.morale=Math.max(0,Math.min(100,s.morale+(s.upgrades.includes('Tribal Memory')?10:3)-Math.max(0,s.tribe.length-4)));if(s.day%3===0)s.xp++;s.tribe.slice(1).forEach(m=>{if(m.loyalty<40)m.health=Math.max(0,m.health-5);});log(`Night falls. The tribe survives into Day ${s.day}. +${foragers} food from foragers, +${scouts} materials from scouts.`);save();render()};
 $('adapt').onclick=()=>{s.xp--;s.maxStamina+=15;s.stamina=s.maxStamina;s.upgrades.push('Primal Adaptation');log('Evolution unlocked: Primal Adaptation.');save();render()};
 $('forager').onclick=()=>{s.xp-=2;s.upgrades.push('Efficient Forager');log('Evolution unlocked: Efficient Forager.');save();render()};
 $('predator').onclick=()=>{s.xp-=3;s.upgrades.push('Predator Instinct');log('Evolution unlocked: Predator Instinct.');save();render()};
-log('Primal Defiance survival prototype ready.');log('Goal: gather → craft → hunt → evolve → survive another day.');render();
+$('keen').onclick=()=>{s.xp-=2;s.upgrades.push('Keen Senses');log('Evolution unlocked: Keen Senses. Your senses become more useful and efficient.');save();render()};
+$('memory').onclick=()=>{s.xp-=3;s.upgrades.push('Tribal Memory');s.morale=Math.min(100,s.morale+10);log('Evolution unlocked: Tribal Memory. The tribe becomes more resilient.');save();render()};
+log('Primal Defiance v3 ready.');log('New systems: primal senses + recruitable tribe + roles + morale.');render();
 </script>
 </body>
 </html>
