@@ -1,0 +1,17 @@
+{
+  "required_games": [
+    {"slug": "custom-dawn-of-defiance", "role": "primary"},
+    {"slug": "custom-ancestors-the-humankind-odyssey", "role": "companion"}
+  ],
+  "must_validate_before_release": [
+    "Installed-game detection",
+    "Correct host executable/launch path",
+    "Companion content read from player installation",
+    "No redistributed game assets",
+    "Build/package inspection",
+    "Recipe validation",
+    "One-click launch check",
+    "Runtime test on creator PC",
+    "Real screenshot or clip"
+  ]
+}
