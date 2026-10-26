@@ -1,0 +1,20 @@
+{
+  "name": "Primal Defiance",
+  "primary": "custom-dawn-of-defiance",
+  "companions": ["custom-ancestors-the-humankind-odyssey"],
+  "mode": "singleplayer",
+  "recipe": {"together": false},
+  "design": {
+    "host_role": "Dawn of Defiance is the playable world and action layer.",
+    "companion_role": "Ancestors supplies real evolution/survival progression data from the player's installed copy.",
+    "first_minute": [
+      "Spawn in Dawn of Defiance.",
+      "Gather starter resources.",
+      "Craft a primitive survival tool.",
+      "Complete one hunt or combat encounter.",
+      "Award the first evolution-linked upgrade based on Ancestors data."
+    ],
+    "cross_game_mechanic": "Evolution-linked progression gates a small set of Dawn of Defiance survival/combat upgrades.",
+    "scope": "One compact progression loop; no copied game assets."
+  }
+}
