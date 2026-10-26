@@ -3,48 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Primal Defiance — Prototype</title>
+<title>Primal Defiance — Survival Prototype</title>
 <style>
-body{margin:0;background:#10120f;color:#eee;font:16px system-ui,sans-serif}main{max-width:900px;margin:40px auto;padding:24px}h1{margin:0 0 6px;font-size:38px}.muted{color:#a8b0a2}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.card{background:#1a1e19;border:1px solid #343b32;border-radius:12px;padding:16px}.big{font-size:28px;font-weight:700}button{padding:12px 16px;border:0;border-radius:9px;background:#d8c58b;color:#111;font-weight:700;cursor:pointer;margin:5px}button:disabled{opacity:.35;cursor:not-allowed}.log{height:170px;overflow:auto;background:#0b0d0b;border-radius:10px;padding:12px;white-space:pre-wrap}.upgrade{display:flex;align-items:center;justify-content:space-between}.bar{height:8px;background:#30362e;border-radius:8px;overflow:hidden}.fill{height:100%;background:#d8c58b;width:0%}
+:root{--bg:#0d100d;--panel:#171b16;--line:#30372e;--text:#f0f1ec;--muted:#aab2a4;--accent:#d7c27e;--danger:#c96d5b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#20261d 0,#0d100d 45%);color:var(--text);font:15px system-ui,sans-serif}main{max-width:1050px;margin:28px auto;padding:22px}h1{margin:0;font-size:42px;letter-spacing:1px}.muted{color:var(--muted)}.tag{display:inline-block;margin:8px 0;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.card{background:rgba(23,27,22,.94);border:1px solid var(--line);border-radius:12px;padding:15px}.stat{font-size:27px;font-weight:800}.bar{height:8px;background:#2b3029;border-radius:9px;overflow:hidden;margin-top:7px}.fill{height:100%;width:0;background:var(--accent);transition:.2s}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}button{padding:12px;border:1px solid #5b604f;border-radius:9px;background:#d7c27e;color:#111;font-weight:800;cursor:pointer}button:disabled{opacity:.3;cursor:not-allowed}.choice{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding:12px 0}.log{height:190px;overflow:auto;background:#080a08;border-radius:9px;padding:12px;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:13px}.danger{color:var(--danger)}@media(max-width:760px){.grid,.actions{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <main>
 <h1>PRIMAL DEFIANCE</h1>
-<div class="muted">Prototype progression layer — Dawn of Defiance host concept + Ancestors-inspired evolution.</div>
+<div class="muted">Survival + evolution prototype — Dawn of Defiance host concept with an Ancestors-inspired progression layer.</div>
+<div class="tag" id="stage">Stage 1 — Survive</div>
 <div class="grid">
-<div class="card"><div class="muted">Materials</div><div id="materials" class="big">0</div></div>
-<div class="card"><div class="muted">Hunts</div><div id="hunts" class="big">0</div></div>
-<div class="card"><div class="muted">Evolution points</div><div id="xp" class="big">0</div></div>
+<div class="card"><div class="muted">Day</div><div id="day" class="stat">1</div></div>
+<div class="card"><div class="muted">Food</div><div id="food" class="stat">6</div><div class="bar"><div id="foodBar" class="fill"></div></div></div>
+<div class="card"><div class="muted">Stamina</div><div id="stamina" class="stat">100</div><div class="bar"><div id="staminaBar" class="fill"></div></div></div>
+<div class="card"><div class="muted">Evolution</div><div id="xp" class="stat">0</div><div class="bar"><div id="xpBar" class="fill"></div></div></div>
 </div>
-<div class="card">
-<h2>First-minute loop</h2>
-<button id="gather">Gather resources (+3)</button>
-<button id="craft">Craft primitive tool (3)</button>
-<button id="hunt">Hunt / combat</button>
-</div>
-<div class="card">
-<h2>Evolution</h2>
-<div class="upgrade"><span><b>Primal Adaptation</b><br><span class="muted">First evolution-linked survival upgrade</span></span><button id="upgrade">Unlock (1 point)</button></div>
-<div class="bar"><div id="fill" class="fill"></div></div>
-<p id="upgrades" class="muted">No upgrades unlocked.</p>
+<div class="card"><h2>Survival actions</h2><div class="actions">
+<button id="gather">Gather (+3 materials)</button><button id="hunt">Hunt (+food / XP)</button><button id="rest">Rest (+stamina)</button>
+<button id="craft">Craft primitive tool (3)</button><button id="explore">Explore territory</button><button id="endday">End day</button>
+</div><p class="muted" id="resources">Materials: 0 · Tool: no · Hunts: 0</p></div>
+<div class="card"><h2>Evolution choices</h2>
+<div class="choice"><span><b>Primal Adaptation</b><br><span class="muted">+15 maximum stamina.</span></span><button id="adapt">Unlock — 1 XP</button></div>
+<div class="choice"><span><b>Efficient Forager</b><br><span class="muted">Gather 5 materials instead of 3.</span></span><button id="forager">Unlock — 2 XP</button></div>
+<div class="choice"><span><b>Predator Instinct</b><br><span class="muted">Hunts grant +2 evolution XP.</span></span><button id="predator">Unlock — 3 XP</button></div>
 </div>
 <div class="card"><h2>Event log</h2><div id="log" class="log"></div></div>
+<p class="muted">Prototype only. It uses no Dawn of Defiance or Ancestors assets and stores this prototype's save in your browser.</p>
 </main>
 <script>
-const s={materials:0,hunts:0,tool:false,xp:0,upgrade:false};
+const key='primal-defiance-survival-v2';
+const fresh={day:1,food:6,stamina:100,maxStamina:100,materials:0,hunts:0,tool:false,xp:0,upgrades:[],dead:false};
+let s=JSON.parse(localStorage.getItem(key)||'null')||fresh;
 const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(key,JSON.stringify(s))}
 function log(t){$('log').textContent+='> '+t+'\n';$('log').scrollTop=$('log').scrollHeight}
+function spend(n){if(s.stamina<n){log('Too exhausted. Rest first.');return false}s.stamina-=n;return true}
 function render(){
- $('materials').textContent=s.materials;$('hunts').textContent=s.hunts;$('xp').textContent=s.xp;
- $('craft').disabled=s.materials<3||s.tool;$('hunt').disabled=!s.tool;$('upgrade').disabled=s.xp<1||s.upgrade;
- $('fill').style.width=s.upgrade?'100%':'0%';$('upgrades').textContent=s.upgrade?'Unlocked: Primal Adaptation':'No upgrades unlocked.';
+ $('day').textContent=s.day;$('food').textContent=s.food;$('stamina').textContent=s.stamina;$('xp').textContent=s.xp;
+ $('foodBar').style.width=Math.min(100,s.food/12*100)+'%';$('staminaBar').style.width=Math.max(0,s.stamina/s.maxStamina*100)+'%';$('xpBar').style.width=Math.min(100,s.xp/6*100)+'%';
+ $('resources').textContent=`Materials: ${s.materials} · Tool: ${s.tool?'yes':'no'} · Hunts: ${s.hunts}`;
+ $('craft').disabled=s.tool||s.materials<3;$('hunt').disabled=!s.tool||s.food<=0;$('adapt').disabled=s.xp<1||s.upgrades.includes('Primal Adaptation');$('forager').disabled=s.xp<2||s.upgrades.includes('Efficient Forager');$('predator').disabled=s.xp<3||s.upgrades.includes('Predator Instinct');
+ $('stage').textContent=s.day<4?'Stage 1 — Survive':s.day<8?'Stage 2 — Adapt':'Stage 3 — Dominate';
 }
-$('gather').onclick=()=>{s.materials+=3;log('Gathered starter materials.');render()};
-$('craft').onclick=()=>{s.materials-=3;s.tool=true;log('Crafted a primitive survival tool.');render()};
-$('hunt').onclick=()=>{s.hunts++;s.xp++;log('Completed a hunt/combat encounter. +1 evolution point.');render()};
-$('upgrade').onclick=()=>{s.xp--;s.upgrade=true;log('Evolution unlocked: Primal Adaptation.');render()};
-log('Primal Defiance prototype ready.');render();
+$('gather').onclick=()=>{if(!spend(8))return;const n=s.upgrades.includes('Efficient Forager')?5:3;s.materials+=n;log(`Gathered ${n} materials.`);save();render()};
+$('craft').onclick=()=>{if(s.materials<3){log('Need 3 materials.');return}s.materials-=3;s.tool=true;log('Crafted a primitive survival tool.');save();render()};
+$('hunt').onclick=()=>{if(!spend(20))return;const food=3+Math.floor(Math.random()*4);s.food=Math.min(12,s.food+food);s.hunts++;s.xp+=s.upgrades.includes('Predator Instinct')?3:1;log(`Successful hunt. +${food} food and evolution XP.`);save();render()};
+$('rest').onclick=()=>{s.stamina=Math.min(s.maxStamina,s.stamina+35);log('Rested and recovered stamina.');save();render()};
+$('explore').onclick=()=>{if(!spend(25))return;const events=['You found a sheltered water source.','You spotted a dangerous predator and escaped.','You found useful stone and fiber.','You discovered a new hunting ground.'];const e=events[Math.floor(Math.random()*events.length)];if(Math.random()<.5)s.materials+=2;log(e);save();render()};
+$('endday').onclick=()=>{if(s.food<=0){log('You cannot end the day without food.');return}s.food--;s.day++;s.stamina=Math.max(0,s.stamina-10);log(`Night falls. Day ${s.day} begins.`);if(s.day%3===0)s.xp++;save();render()};
+$('adapt').onclick=()=>{s.xp--;s.maxStamina+=15;s.stamina=s.maxStamina;s.upgrades.push('Primal Adaptation');log('Evolution unlocked: Primal Adaptation.');save();render()};
+$('forager').onclick=()=>{s.xp-=2;s.upgrades.push('Efficient Forager');log('Evolution unlocked: Efficient Forager.');save();render()};
+$('predator').onclick=()=>{s.xp-=3;s.upgrades.push('Predator Instinct');log('Evolution unlocked: Predator Instinct.');save();render()};
+log('Primal Defiance survival prototype ready.');log('Goal: gather → craft → hunt → evolve → survive another day.');render();
 </script>
 </body>
 </html>
