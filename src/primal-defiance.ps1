@@ -1,13 +1,13 @@
 # Primal Defiance - local bridge prototype
 # Windows PowerShell 5.1+
-# Detects owned Steam installs by Steam AppID, stores progression locally, and can launch the host and survival prototype.
+# Detects owned Steam installs by Steam AppID, stores progression locally, and launches the unified Primal Defiance alpha.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 $AppDir = Join-Path $env:LOCALAPPDATA 'PrimalDefiance'
 $StateFile = Join-Path $AppDir 'state.json'
-$PrototypePath = Join-Path $PSScriptRoot 'prototype.html'
+$PrototypePath = Join-Path $PSScriptRoot 'prototype-v4.html'
 New-Item -ItemType Directory -Force -Path $AppDir | Out-Null
 
 function Read-State {
@@ -85,14 +85,14 @@ function Find-Installations {
 $script:state = Read-State
 $script:installs = Find-Installations
 $form = New-Object System.Windows.Forms.Form
-$form.Text = 'Primal Defiance — Prototype'
+$form.Text = 'Primal Defiance — Release Candidate'
 $form.Size = New-Object System.Drawing.Size(720,575)
 $form.StartPosition = 'CenterScreen'
 
 $title = New-Object System.Windows.Forms.Label
 $title.Text='PRIMAL DEFIANCE'; $title.Font=New-Object System.Drawing.Font('Segoe UI',22,[System.Drawing.FontStyle]::Bold)
 $title.Location=New-Object System.Drawing.Point(24,18); $title.AutoSize=$true; $form.Controls.Add($title)
-$sub=New-Object System.Windows.Forms.Label; $sub.Text='Dawn of Defiance host + Ancestors-inspired evolution progression'
+$sub=New-Object System.Windows.Forms.Label; $sub.Text='Unified survival + senses + tribe layer for Dawn of Defiance'
 $sub.Location=New-Object System.Drawing.Point(27,58); $sub.AutoSize=$true; $form.Controls.Add($sub)
 $status=New-Object System.Windows.Forms.TextBox; $status.Multiline=$true; $status.ReadOnly=$true; $status.ScrollBars='Vertical'
 $status.Location=New-Object System.Drawing.Point(24,90); $status.Size=New-Object System.Drawing.Size(650,175); $form.Controls.Add($status)
@@ -101,21 +101,21 @@ function Refresh-Status {
     $script:installs=Find-Installations
     $dawnText=if($script:installs.Dawn){"FOUND`n$($script:installs.Dawn.Exe)"}else{'NOT FOUND'}
     $ancText=if($script:installs.Ancestors){"FOUND`n$($script:installs.Ancestors.Root)"}else{'NOT FOUND'}
-    $prototypeText=if(Test-Path $PrototypePath){'FOUND'}else{'NOT FOUND'}
+    $prototypeText=if(Test-Path $PrototypePath){'FOUND — Tribe Alpha'}else{'NOT FOUND'}
     $status.Text=@"
 Host — Dawn of Defiance: $dawnText
 
 Companion — Ancestors: The Humankind Odyssey: $ancText
 
-Survival prototype: $prototypeText
+Primal Defiance layer: $prototypeText
 
-Local progression
+Bridge progression
 Materials: $($script:state.materials)    Hunts: $($script:state.hunts)    Tool crafted: $($script:state.toolCrafted)
 Evolution points: $($script:state.evolutionPoints)
 Upgrades: $((@($script:state.upgrades) -join ', '))
 
-Detection uses Steam AppIDs and appmanifest files, so custom Steam library locations are supported.
-No game assets are included.
+Steam AppIDs and appmanifest files are used for detection.
+No game assets are included or redistributed.
 "@
 }
 function Add-Button($text,$x,$y,$action) {
@@ -127,13 +127,13 @@ Add-Button 'Craft primitive tool' 456 285 {if($script:state.materials -ge 3){$sc
 Add-Button 'Complete hunt / combat' 24 345 {if($script:state.toolCrafted){$script:state.hunts+=1;$script:state.evolutionPoints+=1;Save-State $script:state;Refresh-Status}else{[System.Windows.Forms.MessageBox]::Show('Craft the primitive tool first.')}}
 Add-Button 'Unlock evolution upgrade' 240 345 {if($script:state.evolutionPoints -gt 0){$script:state.evolutionPoints-=1;$script:state.upgrades=@($script:state.upgrades)+'Primal Adaptation';Save-State $script:state;Refresh-Status}else{[System.Windows.Forms.MessageBox]::Show('Complete a hunt / combat encounter first.')}}
 Add-Button 'Launch Dawn of Defiance' 456 345 {if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}}
-Add-Button 'Open survival prototype' 24 405 {if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}else{[System.Windows.Forms.MessageBox]::Show('prototype.html was not found beside this launcher.')}}
+Add-Button 'Open Primal Defiance' 24 405 {if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}else{[System.Windows.Forms.MessageBox]::Show('prototype-v4.html was not found beside this launcher.')}}
 Add-Button 'Start Primal Defiance' 240 405 {
     if(Test-Path $PrototypePath){Start-Process -FilePath $PrototypePath}
     if($script:installs.Dawn -and (Test-Path $script:installs.Dawn.Exe)){Start-Process -FilePath $script:installs.Dawn.Exe -WorkingDirectory $script:installs.Dawn.Root}
     else{[System.Windows.Forms.MessageBox]::Show('Dawn of Defiance was not detected in your Steam libraries.')}
 }
-$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset prototype progression'; $reset.Location=New-Object System.Drawing.Point(456,405); $reset.Size=New-Object System.Drawing.Size(200,42)
+$reset=New-Object System.Windows.Forms.Button; $reset.Text='Reset bridge progression'; $reset.Location=New-Object System.Drawing.Point(456,405); $reset.Size=New-Object System.Drawing.Size(200,42)
 $reset.Add_Click({$script:state=[pscustomobject]@{materials=0;hunts=0;toolCrafted=$false;evolutionPoints=0;upgrades=@()};Save-State $script:state;Refresh-Status}); $form.Controls.Add($reset)
 
 Refresh-Status
